@@ -15,20 +15,68 @@ GPIO0-D3        -> LOAD
 #include <stdio.h>
 #include "FS.h"
 
-#define SSID "CBCMEDIA"                      // insert your SSID
-#define PASS "Worship2018"                    // insert your password
+#define SSID ""                      // insert your SSID
+#define PASS ""                    // insert your password
 int wait = 60; // In milliseconds
 int intensity = 7; //0-15
 // ******************* String form to sent to the client-browser ************************************
 
-String form =
-  "<p>"
-  "<center>"
-  "<h1>Ron's Sweet Ticker</h1>"
-  "<form action='msg'><p>Type your message <input type='text' name='msg' size=100 autofocus> <input type='submit' value='Submit'></form>"
-  "<form action='speed'><p>What Speed do you want? <input type='number' name='speed' size=20 autofocus> <input type='submit' value='Submit'></form>"
-  "<form action='intensity'><p>Enter Brightness 0 - 15 <input type='number' name='intensity' size=5 autofocus> <input type='submit' value='Submit'></form>"
-  "</center>";
+// String form =
+//   "<html>"
+//   "<head>"
+//   "<style>"
+//   "body { background-color: black; color: white; }"
+//   "input { font-size: 16px; height: 40px; }"
+//   "</style>"
+//   "</head>"
+//   "<body>"
+//   "<center>"
+//   "<h1>JACOB's Thick Ticker</h1>"
+//   "<form action='msg'><p>Type your message <input type='text' name='msg' style='width: 200px;' autofocus> <input type='submit' value='Submit'></form>"
+//   "<form action='speed'><p>Speed 10=fast 1=slow <input type='number' name='speed' style='width: 100px;' autofocus> <input type='submit' value='Submit'></form>"
+//   "<form action='intensity'><p>Enter Brightness 0 - 15 <input type='number' name='intensity' style='width: 50px;' autofocus> <input type='submit' value='Submit'></form>"
+//   "</center>"
+//   "</body>"
+//   "</html>";
+
+String form = 
+  "<html lang=\"en\">"
+  "<head>"
+  "<meta charset=\"UTF-8\">"
+  "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+  "<link href=\"https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css\" rel=\"stylesheet\">"
+  "<title>JACOB's Thick Ticker</title>"
+  "</head>"
+  "<body class=\"bg-black text-white\">"
+  "<div class=\"container mx-auto p-4\">"
+  "<div class=\"text-center\">"
+  "<h1 class=\"text-3xl font-bold mb-8\">JACOB's Thick Ticker</h1>"
+
+  "<form action=\"msg\" class=\"mb-4\">"
+  "<label class=\"block mb-2\">Type your message</label>"
+  "<input type=\"text\" name=\"msg\" class=\"w-48 px-4 py-2 border rounded focus:outline-none focus:border-blue-500\" autofocus>"
+  "</form>"
+
+  "<form action=\"speed\" class=\"mb-4\">"
+  "<label class=\"block mb-2\">Speed 10=fast 1=slow</label>"
+  "<input type=\"number\" name=\"speed\" class=\"w-24 px-4 py-2 border rounded focus:outline-none focus:border-blue-500\" autofocus>"
+  "</form>"
+
+  "<form action=\"intensity\" class=\"mb-4\">"
+  "<label class=\"block mb-2\">Enter Brightness 0 - 15</label>"
+  "<input type=\"number\" name=\"intensity\" class=\"w-16 px-4 py-2 border rounded focus:outline-none focus:border-blue-500\" autofocus>"
+  "</form>"
+
+  "<form action=\"submit\" class=\"mt-4\">"
+  "<input type=\"submit\" value=\"Submit\" class=\"px-4 py-2 bg-blue-500 text-white rounded cursor-pointer\">"
+  "</form>"
+
+  "</div>"
+  "</div>"
+  "</body>"
+  "</html>";
+
+
 
 ESP8266WebServer server(80);                             // HTTP server will listen at port 80
 long period;
@@ -95,7 +143,21 @@ void handle_speed() {
   refresh=1;
   // Display msg on Oled
   String msg = server.arg("msg");
+
   wait = server.arg("speed").toInt();
+  // Assuming speedMin = 40 and speedMax = 15
+  int speedMin = 1;
+  int speedMax = 10;
+
+  // The new range you want (1 to 10)
+  int newRangeMin = 15;
+  int newRangeMax = 40;
+
+  // Map the original speed to the new range
+  int mappedSpeed = map(wait, speedMax, speedMin, newRangeMin, newRangeMax);
+  wait = mappedSpeed;
+  // Now 'mappedSpeed' will be the speed in the range of 1 to 10
+  Serial.println(mappedSpeed);
   Serial.println(msg);
   Serial.println(wait);
 }
@@ -183,7 +245,8 @@ void loop(void) {
  
     while ( x + width - spacer >= 0 && letter >= 0 ) {
       if ( letter < decodedMsg.length() ) {
-        matrix.drawChar(x, y, decodedMsg[letter], HIGH, LOW, 1);
+        // matrix.drawChar(x, y, decodedMsg[letter], HIGH, LOW, 1);
+
       }
 
       letter--;
